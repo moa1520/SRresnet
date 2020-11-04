@@ -6,6 +6,7 @@ import numpy as np
 import os
 import glob
 from PIL import Image
+from torchvision.transforms.transforms import Resize
 
 
 def image_to_array(path):
@@ -26,9 +27,6 @@ def crop_and_save(img, scale, id):
     for j in range(h_count):
         for i in range(w_count):
             imgs.append(img[j*scale:(j+1) * scale, i*scale:(i+1) * scale, :])
-    # for j in range(0, height, scale):
-    #     for i in range(0, width, scale):
-    #         imgs.append(img[j:j+scale, i:i+scale, :])
 
     for i, img in enumerate(imgs):
         img = Image.fromarray(img)
@@ -61,7 +59,8 @@ class CustomDataset(Dataset):
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation((90, 90)),
             transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize(mean=[0.5, 0.5, 0.5],
+                                 std=[0.5, 0.5, 0.5])
         ])
 
     def __getitem__(self, index):

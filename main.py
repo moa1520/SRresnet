@@ -22,24 +22,24 @@ def train():
 
     # DataLoader
     dataset = CustomDataset()
-    customImageLoader = DataLoader(dataset, batch_size=64, shuffle=True)
+    customImageLoader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-    epochs = 1
+    epochs = 10
 
-    # Criterion, Optimizer
-    criterion = nn.MSELoss()
+    # Criterion, Optimizer, Scheduler
     optimizer = optim.Adam(net.parameters(), lr=0.001)
+    criterion = nn.L1Loss()
+    scheduler = optim.lr_scheduler.StepLR(
+        optimizer=optimizer, step_size=1, gamma=0.1)
 
     if cuda:
         net.cuda()
         criterion.cuda()
 
-    Tensor = torch.cuda.FloatTenor if cuda else torch.Tensor
+    Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 
     for epoch in range(epochs):
         for i, imgs in enumerate(customImageLoader):
-            if i != 0:
-                break
             hr_img = Variable(imgs['hr'], requires_grad=False).type(Tensor)
             lr_img = Variable(imgs['lr']).type(Tensor)
 
@@ -53,12 +53,18 @@ def train():
             if i % 100 == 0:
                 print("==> Epoch [{}] ({} / {}) : Loss : {:.5}".format(
                     epoch, i, len(customImageLoader), loss.item()))
-        save_checkpoint(net, epoch)
+        scheduler.step()
+        save_checkpoint(net, epoch, optimizer, criterion)
 
 
-def save_checkpoint(model, epoch):
+def save_checkpoint(model, epoch, optimizer, loss):
     model_out_path = "checkpoint/" + "model_epoch_{}.pth".format(epoch)
-    state = {"epoch": epoch, "model": model}
+    state = {
+        "epoch": epoch,
+        "model_state_dict": model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': loss
+    }
     if not os.path.exists("checkpoint/"):
         os.mkdir("checkpoint/")
 
