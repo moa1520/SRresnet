@@ -44,6 +44,7 @@ def train():
 
     if cuda:
         net.cuda()
+        discriminator.cuda()
         criterion.cuda()
 
     Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
