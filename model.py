@@ -114,10 +114,12 @@ class Discriminator(nn.Module):
             nn.LeakyReLU()
         )
 
-        self.linear = nn.Sequential(
-            nn.Linear(8192, 1024),
+        self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d(1)
+
+        self.layer9 = nn.Sequential(
+            nn.Linear(512, 512),
             nn.LeakyReLU(),
-            nn.Linear(1024, 1),
+            nn.Linear(512, 1),
             nn.Sigmoid()
         )
 
@@ -130,8 +132,9 @@ class Discriminator(nn.Module):
         x = self.layer6(x)
         x = self.layer7(x)
         x = self.layer8(x)
+        x = self.AdaptiveAvgPool(x)
         x = x.reshape(self.batch_size, -1)
-        x = self.linear(x)
+        x = self.layer9(x)
 
         return x
 
