@@ -68,9 +68,78 @@ class SRresnet(nn.Module):
         return output
 
 
+class Discriminator(nn.Module):
+    def __init__(self, batch_size) -> None:
+        super(Discriminator, self).__init__()
+
+        self.batch_size = batch_size
+
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=3 // 2),
+            nn.LeakyReLU()
+        )
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=3 // 2),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU()
+        )
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, padding=3 // 2),
+            nn.BatchNorm2d(128),
+            nn.LeakyReLU()
+        )
+        self.layer4 = nn.Sequential(
+            nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=3 // 2),
+            nn.BatchNorm2d(128),
+            nn.LeakyReLU()
+        )
+        self.layer5 = nn.Sequential(
+            nn.Conv2d(128, 256, kernel_size=3, padding=3 // 2),
+            nn.BatchNorm2d(256),
+            nn.LeakyReLU()
+        )
+        self.layer6 = nn.Sequential(
+            nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=3 // 2),
+            nn.BatchNorm2d(256),
+            nn.LeakyReLU()
+        )
+        self.layer7 = nn.Sequential(
+            nn.Conv2d(256, 512, kernel_size=3, padding=3 // 2),
+            nn.BatchNorm2d(512),
+            nn.LeakyReLU()
+        )
+        self.layer8 = nn.Sequential(
+            nn.Conv2d(512, 512, kernel_size=3, stride=2, padding=3 // 2),
+            nn.BatchNorm2d(512),
+            nn.LeakyReLU()
+        )
+
+        self.linear = nn.Sequential(
+            nn.Linear(8192, 1024),
+            nn.LeakyReLU(),
+            nn.Linear(1024, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.layer5(x)
+        x = self.layer6(x)
+        x = self.layer7(x)
+        x = self.layer8(x)
+        x = x.reshape(self.batch_size, -1)
+        x = self.linear(x)
+
+        return x
+
+
 if __name__ == '__main__':
-    net = SRresnet()
-    img = torch.Tensor(16, 3, 64, 64)
+    net = Discriminator(batch_size=32)
+    img = torch.Tensor(32, 3, 64, 64)
+    print("input shape :", img.shape)
 
     output = net(img)
-    print(net)
+    print("output shape :", output.shape)
