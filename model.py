@@ -69,10 +69,8 @@ class SRresnet(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, batch_size) -> None:
+    def __init__(self) -> None:
         super(Discriminator, self).__init__()
-
-        self.batch_size = batch_size
 
         self.layer1 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=3, padding=3 // 2),
@@ -124,6 +122,7 @@ class Discriminator(nn.Module):
         )
 
     def forward(self, x):
+        batch_size = x.size(0)
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
@@ -133,7 +132,7 @@ class Discriminator(nn.Module):
         x = self.layer7(x)
         x = self.layer8(x)
         x = self.AdaptiveAvgPool(x)
-        x = x.reshape(self.batch_size, -1)
+        x = x.reshape(batch_size, -1)
         x = self.layer9(x)
 
         return x

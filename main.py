@@ -24,7 +24,7 @@ def train():
     # Import Model
     net = SRresnet()
     net.train()
-    discriminator = Discriminator(batch_size=batch_size)
+    discriminator = Discriminator()
 
     # DataLoader
     dataset = CustomDataset()
