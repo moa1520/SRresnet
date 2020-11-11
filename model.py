@@ -139,8 +139,8 @@ class Discriminator(nn.Module):
 
 
 if __name__ == '__main__':
-    net = Discriminator(batch_size=32)
-    img = torch.Tensor(32, 3, 64, 64)
+    net = Discriminator()
+    img = torch.Tensor(16, 3, 64, 64)
     print("input shape :", img.shape)
 
     output = net(img)

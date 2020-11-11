@@ -84,15 +84,16 @@ def train():
                 print("==> Epoch [{}] ({} / {}) : Loss_D : {:.5}".format(
                     epoch, i, len(customImageLoader), loss_D.item()))
         scheduler.step()
-        # save_checkpoint(net, epoch, optimizer, criterion)
+        save_checkpoint(net, epoch, G_optimizer, D_optimizer, criterion)
 
 
-def save_checkpoint(model, epoch, optimizer, loss):
+def save_checkpoint(model, epoch, G_optimizer, D_optimizer, loss):
     model_out_path = "checkpoint/" + "model_epoch_{}.pth".format(epoch)
     state = {
         "epoch": epoch,
         "model_state_dict": model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
+        'G_optimizer_state_dict': G_optimizer.state_dict(),
+        'D_optimizer_state_dict': D_optimizer.state_dict(),
         'loss': loss
     }
     if not os.path.exists("checkpoint/"):
